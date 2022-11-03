@@ -237,13 +237,17 @@ On your **DigitalOcean server**, you can see which applications UFW currently al
 rohit@hostname:~$ sudo ufw app list
 ```
 
-We need to make sure the firewall allows SSH connections so that we can log back in next time. We also need to open the ports which are 22, 80 and 443. To allow these types of connections, type the following commands:
+This should output the following:
+
+```bash
+Available applications
+  OpenSSH
+```
+
+We need to make sure the firewall allows SSH connections so that we can log back in next time. To allow these types of connections, type the following command:
 
 ```console
 rohit@hostname:~$ sudo ufw allow OpenSSH
-rohit@hostname:~$ sudo ufw allow ssh # Port 22
-rohit@hostname:~$ sudo ufw allow http # Port 80
-rohit@hostname:~$ sudo ufw allow https # Port 443
 ```
 
 And then enable the firewall:
@@ -414,3 +418,136 @@ You should see the default Nginx landing page, which should look something like 
 ![Nginx landing page](./assets/nginx_landing_page.png)
 
 You now have a web server running!
+
+
+## Step 4 - Configure The Node.js Application
+
+You should now have a server running with Nginx.
+
+Now you are ready to install Node.js and configure your application.
+
+### Install Node.js
+
+We will install the latest LTS release of Node.js, using the [NodeSource](https://github.com/nodesource/distributions "NodeSource") package archives.
+
+First, you need to install the NodeSource PPA to get access to its contents. We'll use `curl` to retrieve the installation script for the Latest LTS Version of Node.js archives.
+
+First, make sure you have navigated to your home directory:
+
+```console
+rohit@hostname:~$ cd ~
+```
+
+Then, you can retrieve the installation script:
+
+```console
+rohit@hostname:~$ curl -sL https://deb.nodesource.com/setup_lts.x -o nodesource_setup.sh
+```
+
+And run the script using `sudo`:
+
+```console
+rohit@hostname:~$ sudo bash nodesource_setup.sh
+```
+
+The `nodesource_setup.sh` script won't be needed again, so let's delete it:
+
+```console
+rohit@hostname:~$ sudo rm nodesource_setup.sh
+```
+
+The PPA has now been added to your configuration and your local package cache will be automatically updated.
+
+You can now install the Node.js package using `apt-get`:
+
+```console
+rohit@hostname:~$ sudo apt-get install nodejs
+```
+
+Check to see if `nodejs` and `npm` was installed:
+
+```console
+rohit@hostname:~$ node --version && npm --version
+```
+
+Node.js is now installed and ready to use. Let's get a Node.js application up and running!
+
+### Create a Node.js application
+
+We'll use a simple application to get you started, which you can replace with your own application later on. For now, we'll create an application that simply returns `Hello from your node app!` to any HTTP requests.
+
+If you already have an application ready to go, you can skip the next section where we create a sample application.
+
+### Application Code
+
+Navigate to your home directory:
+
+```console
+rohit@hostname:~$ cd ~
+```
+
+Let’s started by creating a folder and initializing the project:
+
+
+```console
+rohit@hostname:~$ mkdir nginx_server_project
+rohit@hostname:~$ cd nginx_server_project
+rohit@hostname:~$ npm init -y
+```
+
+The above code will create the folder `nginx_server_project` and change the directory into the folder. We then initialize a Node.js application with npm, using the `-y` flag to set `yes` as the default answer to all the questions.
+
+The next step is to create the `server.js` file that contains the source code for our application.
+
+```console
+rohit@hostname:~$ nano server.js
+```
+
+And add the following code to the `server.js` file:
+
+```javascript
+const http = require('http');
+
+const server = http.createServer((req, res) => {
+	res.writeHead(200, {'Content-Type': 'text/plain'});
+	res.end('Hello from your node app!\n');
+});
+
+server.listen(5000);
+
+console.log('Server running at http://localhost:5000/');
+```
+
+When ran, the `server.js` application will simply listen on the `localhost` address and port `8080`, and return `Hello from your node app!` with a `200` HTTP success code on each request.
+
+Save the file and exit the editor (`CTRL-X`+`Y`+`ENTER`).
+
+### Test Application
+
+To test your application, run the `server.js` file with the following command:
+
+```console
+rohit@hostname:~$ node server.js
+```
+
+You should get this output:
+
+```bash
+Server running at http://localhost:8080/
+```
+
+To test the HTTP response for your application, open another terminal window on your server, and connect to `localhost` using `curl`:
+
+```console
+rohit@hostname:~$ curl http://localhost:8080
+```
+
+You should the following message in the output:
+
+```bash
+Hello from your node app!
+```
+
+If you don't see the right output, make sure your application is running and configured to listen on the `8080` port.
+
+Once you have confirmed the application is working, kill the application with `CTRL`+`C`.
