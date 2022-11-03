@@ -326,3 +326,91 @@ It may take some time for the name server changes to propagate after you've save
 During this time, the domain registrar communicates the changes you've made with your ISP (Internet Service Provider). In turn, your ISP caches the new nameservers to ensure quick site connections. This process usually takes about 30 minutes but could take up to a few hours depending on your registrar and your ISP's communication methods.
 
 You should now have a domain pointing at your newly created DigitalOcean server.
+
+## Step 3 - Install & Configure Nginx
+
+Now we need to install NGINX to serve our app on port 80, which is the http port
+
+### Install Nginx
+
+Nginx is available in Ubuntu's default repositories, so installation is pretty straightforward.
+
+On your **DigitalOcean server**, run the following commands to update your local `apt package` index so we have access to the most recent package lists:
+
+```console
+rohit@hostname:~$ sudo apt-get update && sudo apt-get install nginx
+```
+
+The `apt-get` command will install Nginx along with any other required dependencies.
+
+When those commands finish, Nginx will be available for you to use on the server.
+
+### Adjust The Firewall
+
+Before we can test Nginx, we need to reconfigure our firewall software to allow access to the service. Nginx registers itself as a service with `ufw`, our firewall, upon installation. This makes it rather easy to allow Nginx access.
+
+```console
+rohit@hostname:~$ sudo ufw app list
+```
+
+You should get a listing of the application profiles:
+
+```bash
+Available applications:
+  Nginx Full
+  Nginx HTTP
+  Nginx HTTPS
+  OpenSSH
+```
+
+There are three profiles available for Nginx:
+
+* **Nginx Full**: Opens both port `80` (normal, unencrypted web traffic) and port `443` (`TLS/SSL` encrypted traffic)
+* **Nginx Http**: Opens only port `80` (normal, unencrypted web traffic)
+* **Nginx Https**: Opens only port `443` (`TLS/SSL` encrypted traffic)
+
+It is recommended that you enable the most restrictive profile that will still allow the traffic you've configured. Since we haven't configured SSL for our server yet, in this guide, we will only need to allow traffic on port `80`.
+
+When we configure SSL/HTTPS encryption later on, we'll change these settings.
+
+You can enable this by typing:
+
+```console
+rohit@hostname:~$ sudo ufw allow 'Nginx HTTP'
+```
+
+You can verify the change with this command:
+
+```console
+rohit@hostname:~$ sudo ufw status
+```
+
+You should see Nginx HTTP listed in the output.
+
+### Test Your Web Server
+
+The Nginx web server should already be up and running.
+
+You can check with the systemd init system to make sure the service is running by typing:
+
+```console
+rohit@hostname:~$ systemctl status nginx
+```
+
+This should output the following:
+
+![Test Your Web Server](./assets/test_web_server.png)
+
+You can access the default Nginx landing page to confirm that it is running properly. You can access this through your server's domain name or IP address.
+
+When you have your server's IP address or domain, enter it into your browser's address bar:
+
+```bash
+http://SERVER_DOMAIN_OR_IP
+```
+
+You should see the default Nginx landing page, which should look something like this:
+
+![Nginx landing page](./assets/nginx_landing_page.png)
+
+You now have a web server running!
