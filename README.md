@@ -260,3 +260,69 @@ rohit@hostname:~$ sudo ufw status
 ```
 
 That was the last step in the initial setup for the server.
+
+## Step 2 - Configure Your Domain Name
+
+In this section, we'll configure a domain name that you want to use for your Node.js application.
+
+To set up a domain, you'll need to do two things:
+
+1. Purchase a domain name from a domain name registrar.
+
+2. Setup DNS (Domain Name System) records for your domain by using a DNS hosting service.
+
+DigitalOcean is not a domain name registrar, which means you can't purchase a domain name from them. But, they do provide a DNS hosting service that makes it easy to configure a domain name with their servers.
+
+### Configure DNS
+
+Using DigitalOcean, let's configure DNS for your domain.
+
+Back on the DigitalOcean website, open the Create drop-down menu and click the Domains/DNS link.
+
+In the Add a Domain section, enter your domain (this is usually the base only: `example.com` and not `www.example.com`) and click the Add Domain button.
+
+![Add Domain](./assets/add_domain.png)
+
+After you click the **Add Domain** button, you will be taken to the **Create new record** page.
+
+You now need to add NS records for the domain on DigitalOcean servers. You'll only be adding `A` records, which maps an `IPv4 address` to a domain name. This will determine where to direct any requests for your domain name.
+
+Therefore, we need to create two `A` records for your website.
+
+For the first one, enter `@` in the `HOSTNAME` field and select the server you want to point the domain name to:
+
+![Configure DNS 1](./assets/configure_dns_1.png)
+
+For the second one, enter `www` in the `HOSTNAME` field and select the same server:
+
+![Configure DNS 2](./assets/configure_dns_2.png)
+
+Make sure the `A` records are pointed to the correct server droplet.
+
+Awesome, we can move on to the next step.
+
+### Configure Your Domain Registrar To Direct The Domain To DigitalOcean
+
+To use the DigitalOcean DNS, you'll need to update the nameservers used by your domain registrar to point at DigitalOcean's nameservers instead.
+
+As an example, we'll walk you through the steps for doing this for `Name.com`. But, these steps can be easily replicated for whatever other service you used (GoDaddy, HostGator, etc.).
+
+First, sign in to your `Name.com` account and click `My Domains` link on the top navigation bar. You will be presented with a dashboard listing all of your domains.
+
+Click the `Quick Links` dropdown then `Manage Domain` button of the domain you'd like to update.
+
+![Configure Domain Registrar](./assets/configure_domain_registrar.png)
+
+In the `Nameservers` section of the resulting screen, click `Manage Nameservers` then enter the following nameservers:
+
+* `ns1.digitalocean.com`
+* `ns2.digitalocean.com`
+* `ns3.digitalocean.com`
+
+![Manage Nameservers](./assets/manage_nameservers.png)
+
+It may take some time for the name server changes to propagate after you've saved them.
+
+During this time, the domain registrar communicates the changes you've made with your ISP (Internet Service Provider). In turn, your ISP caches the new nameservers to ensure quick site connections. This process usually takes about 30 minutes but could take up to a few hours depending on your registrar and your ISP's communication methods.
+
+You should now have a domain pointing at your newly created DigitalOcean server.
