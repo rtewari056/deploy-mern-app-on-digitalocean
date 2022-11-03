@@ -81,7 +81,7 @@ The first step is to gain access to the server using your root login.
 
 To log into your server, open a terminal on your local machine and use the following command to SSH in as the root user (replace `SERVER_IP_ADDRESS` with your server's public IP address and `PRIVATE_KEY` with the private key file name):
 
-```console
+```bash
 ssh -i ~/.ssh/PRIVATE_KEY_FILE_NAME root@SERVER_IP_ADDRESS
 ```
 
@@ -182,3 +182,81 @@ rohit@hostname:~$ exit
 ```
 
 Now your public key is installed, and you can use SSH keys to log in as your user.
+
+### Disable Password Authentication
+
+This is an extra security step. We can disable passwords so that only your local machine with the correct SSH keys can login.
+
+As the `root` user or new `sudo` user on your **DigitalOcean server**, open the SSH daemon configuration file using the following command:
+
+```console
+rohit@hostname:~$ sudo nano /etc/ssh/sshd_config
+```
+
+Find the line that says `PasswordAuthentication` and change its value to `no`. It should look like this after the change was made:
+
+```bash
+PasswordAuthentication no
+```
+
+Save and close the file using the method: `CTRL-X`, then `Y`, then `ENTER`.
+
+To reload the SSH daemon and put the changes live, execute the following command:
+
+```console
+rohit@hostname:~$ sudo systemctl reload sshd
+```
+
+Password authentication is now disabled. Now your server can only be accessed with SSH key authentication.
+
+### Test Log In Using SSH Key
+
+Let's test logging in using the SSH key.
+
+On your **local machine**, SSH into your server using the new account that we created. Use the following command to do so (substitute your username and IP address):
+
+```bash
+$ ssh USERNAME@SERVER_IP_ADDRESS
+```
+
+If you have too many keys on your local Machine, then you can try specifying which key you want to use:
+
+```bash
+$ ssh -i ~/.ssh/PRIVATE_KEY_FILE_NAME USERNAME@SERVER_IP_ADDRESS
+```
+
+Once authentication is provided to the server, you will be logged in as your new user.
+
+### Basic Firewall Set Up
+
+Another security improvement we can make to the server is to add a basic firewall so that people can not directly access any port except ports for ssh, http and https
+
+On your **DigitalOcean server**, you can see which applications UFW currently allows by typing:
+
+```console
+rohit@hostname:~$ sudo ufw app list
+```
+
+We need to make sure the firewall allows SSH connections so that we can log back in next time. We also need to open the ports which are 22, 80 and 443. To allow these types of connections, type the following commands:
+
+```console
+rohit@hostname:~$ sudo ufw allow OpenSSH
+rohit@hostname:~$ sudo ufw allow ssh # Port 22
+rohit@hostname:~$ sudo ufw allow http # Port 80
+rohit@hostname:~$ sudo ufw allow https # Port 443
+```
+
+And then enable the firewall:
+
+```console
+rohit@hostname:~$ sudo ufw enable
+```
+
+Press `y` and then `ENTER` to proceed. You can see that SSH connections are still allowed by typing:
+
+
+```console
+rohit@hostname:~$ sudo ufw status
+```
+
+That was the last step in the initial setup for the server.
