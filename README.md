@@ -551,3 +551,63 @@ Hello from your node app!
 If you don't see the right output, make sure your application is running and configured to listen on the `8080` port.
 
 Once you have confirmed the application is working, kill the application with `CTRL`+`C`.
+
+## Step 5 - Install & Configure PM2
+
+You are now ready to install and configure [PM2](https://github.com/Unitech/pm2 "PM2"), which is a process manager for Node.js applications. It will allow you to keep your Node.js application alive forever, reload it without downtime and help facilitate common system admin tasks.
+
+### Install PM2
+
+Using `npm`, you can install `PM2` on your server with the following command:
+
+```console
+rohit@hostname:~$ sudo npm install -g pm2
+```
+
+The `-g` option tells `npm` to install the module globally. It will now be available across your server's system.
+
+### Start Application
+
+First, go to the directory where your application is located:
+
+```console
+rohit@hostname:~$ cd nginx_server_project/
+```
+
+Use the `pm2 start` command to start running your `server.js` application in the background:
+
+```console
+rohit@hostname:~/nginx_server_project$ pm2 start server.js
+```
+
+This also adds your application to PM2's process list, which is outputted every time an application is started. Here is what the output should look like:
+
+![Start Application](./assets/start_application.png)
+
+PM2 applications will be restarted automatically if the application crashes or is killed. But additional steps need to be taken for applications to start on system startup (reboot or boot). PM2 provides an easy way to do this with its `startup` command.
+
+Run it with the following command:
+
+```console
+rohit@hostname:~$ pm2 startup systemd
+```
+
+In the resulting output on the last line, there will be a command that you must run with superuser privileges:
+
+![PM2 Startup Command](./assets/pm2_startup_command.png)
+
+Copy and paste the command that was generated (same as above but with your username instead of `rohit`) to have PM2 always start when your server is booted.
+
+Your command will look similar to this:
+
+```console
+rohit@hostname:~$ sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u rohit --hp /home/rohit
+```
+
+This will create a **systemd unit** that will run `PM2` for your user on boot. This `PM2` instance, in turn, will run `server.js`. 
+
+To check the status of the new systemd unit, use the following command:
+
+```console
+rohit@hostname:~$ systemctl status pm2-rohit
+```
