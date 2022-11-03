@@ -611,3 +611,92 @@ To check the status of the new systemd unit, use the following command:
 ```console
 rohit@hostname:~$ systemctl status pm2-rohit
 ```
+
+## Step 6 - Setup Nginx As A Reverse Proxy
+
+Now that your application is running and listening on `localhost`, you need to make it so people from the outside world can access it. To achieve this, we will use Nginx as a reverse proxy.
+
+For Nginx to route to the Node.js application, we’ll need to first unlink the default configuration of Nginx and then create a new configuration to be used for by our Node.js application.
+
+To unlink the default Nginx configuration, you can use the following command:
+
+```console
+rohit@hostname:~$ sudo unlink /etc/nginx/sites-available/default
+```
+
+The Nginx configuration is kept in the `/etc/nginx/sites-available` directory. To create a new configuration, let’s navigate to this directory and create a configuration file pointing to the server block of our Node.js application.
+
+```console
+rohit@hostname:~$ cd /etc/nginx/sites-available
+rohit@hostname:~$ sudo nano myserver.config
+```
+
+After changing the directory to `/etc/nginx/sites-available`, the second command will create and open an Nginx configuration file named `myserver.config`.
+
+Paste in the following configuration:
+
+```bash
+# The Nginx server instance
+server {
+    listen 80;
+    server_name your_domain www.your_domain;
+
+    location / {
+    proxy_pass http://localhost:8080;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection 'upgrade';
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Host $server_name;
+    proxy_cache_bypass $http_upgrade;
+
+    # Security Patches (Optional)
+    server_tokens off;
+    proxy_hide_header X-powered-by;
+    proxy_hide_header X-Runtime;
+    add_header X-XSS-Protection "1; mode=block";
+    add_header X-Frame-Options "deny";
+    add_header X-Content-Type-Options "nosniff";
+
+    }
+}
+```
+
+The above configuration has Nginx listening on port `80` on your_domain.com.
+
+Save the file and exit the editor (`CTRL-X`+`Y`+`ENTER`).
+
+For the next step, let’s enable the above file by creating a symbolic from it to the `sites-enabled` directory, which Nginx reads from during startup:
+
+```console
+rohit@hostname:~$ sudo ln -s /etc/nginx/sites-available/myserver.config /etc/nginx/sites-enabled/
+```
+
+The server block is now enabled and configured to return responses to requests based on the `listen` port and `location` path.
+
+Now it’s time to start both our Node.js application (If not started already using PM2) and the Nginx service to trigger the recent changes. But first, let’s check the status of Nginx to confirm that the configuration is working properly:
+
+```console
+rohit@hostname:~$ sudo nginx -t
+```
+
+The output upon running the above command would look like this:
+
+```
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+```
+
+The above output confirms that our configuration was successful. Next, restart Nginx to enable your changes:
+
+```console
+rohit@hostname:~$ sudo systemctl restart nginx
+```
+
+Assuming that your Node.js application is running, and your Nginx configurations are correct, you should now be able to access your application via the Nginx reverse proxy.
+
+Try it out by viewing the `www.your_domain.com` web page in your browser.
+
+You should see the `Hello from your node app!` message displayed on the page. This means your Node.js application is up and running!
