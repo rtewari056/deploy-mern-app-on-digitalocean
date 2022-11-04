@@ -700,3 +700,116 @@ Assuming that your Node.js application is running, and your Nginx configurations
 Try it out by viewing the `www.your_domain.com` web page in your browser.
 
 You should see the `Hello from your node app!` message displayed on the page. This means your Node.js application is up and running!
+
+## Step 7 - Configure SSL/HTTPS Using Let's Encrypt & Certbot
+
+[Let's Encrypt](https://letsencrypt.org/ "Let's Encrypt") is a Certificate Authority (CA) that provides an easy way to obtain and install free SSL certificates, thereby enabling encrypted HTTPS on web servers. It simplifies the process by providing a software client, [Certbot](https://certbot.eff.org/ "Certbot"), that attempts to automate most (if not all) of the required steps.
+
+Currently, the entire process of obtaining and installing a certificate is fully automated on both Apache and Nginx.
+
+We'll use Certbot to obtain a free `SSL` certificate for Nginx and set up your certificate to renew automatically.
+
+### Install Certbot
+
+The first step is to install the Certbot software on your server.
+
+First, add the repository to your server:
+
+```console
+rohit@hostname:~$ sudo add-apt-repository ppa:certbot/certbot
+```
+
+Press `ENTER` to accept.
+
+Then, update the package list to pick up the new Certbot repository information:
+
+```console
+rohit@hostname:~$ sudo apt-get update
+```
+
+When that finishes, install Certbot's Nginx package using the `apt` package manager:
+
+```console
+rohit@hostname:~$ sudo apt-get install python3-certbot-nginx
+```
+
+Certbot is now ready to use!
+
+### Allow HTTPS Access In Your Firewall
+
+Previously, we configured the `ufw` firewall on your server to allow HTTP traffic. To additionally let in HTTPS traffic, we need to allow the `Nginx Full` profile and then delete the redundant `Nginx HTTP` allowance.
+
+Here is the command to allow `Nginx Full`:
+
+```console
+rohit@hostname:~$ sudo ufw allow 'Nginx Full'
+```
+
+And here is the command to delete the redundant `Nginx HTTP` profile:
+
+```console
+rohit@hostname:~$ sudo ufw delete allow 'Nginx HTTP'
+```
+
+We're now ready to run Certbot and fetch the `SSL` certificates.
+
+### Get The SSL Certificate From Certbot
+
+Certbot provides a variety of ways to obtain SSL certificates, through various plugins. The Nginx plugin will take care of reconfiguring Nginx and reloading the configuration settings whenever it's necessary.
+
+To get SSL certificates for your `your_domain.com` and `www.your_domain.com` URLs, use this command (make sure to use your URLs):
+
+```console
+rohit@hostname:~$ sudo certbot --nginx -d your_domain.com -d www.your_domain.com
+```
+
+This runs Certbot with the `--nginx` plugin, using `-d` to specify the names we'd like the certificate to be valid for.
+
+If this is your first time running Certbot, you'll be prompted to enter an email address and agree to the terms of service. After doing so, certbot will communicate with the Let's Encrypt server, then run a challenge to verify that you control the domain you're requesting a certificate for.
+
+If that's successful, `certbot` will ask how you'd like to configure your HTTPS settings.
+
+```
+Please choose whether or not to redirect HTTP traffic to HTTPS, removing HTTP access.
+-------------------------------------------------------------------------------
+1: No redirect - Make no further changes to the webserver configuration.
+2: Redirect - Make all requests redirect to secure HTTPS access. Choose this for
+new sites, or if you're confident your site works on HTTPS. You can undo this
+change by editing your web server's configuration.
+-------------------------------------------------------------------------------
+Select the appropriate number [1-2] then [enter] (press 'c' to cancel):
+```
+
+Select your choice then hit `ENTER`. The configuration will be updated, and Nginx will reload to pick up the new settings.
+
+The redirect option (Option 2) is the suggested choice. This will ensure that your website is always served over `https://`.
+
+Your site is now being served over HTTPS!
+
+Enter your domain into your browser's address bar and check it out:
+
+![Site is now being served over HTTPS!](./assets/configure_domain_https.png)
+
+Your certificates are now downloaded, installed, and loaded. And notice that your website is now being served over HTTPS.
+
+### Verify Certbot Auto-Renew
+
+Let's Encrypt's certificates are only valid for 90 days. This is to encourage users to automate their certificate renewal process.
+
+The Certbot package we installed takes care of this for us by running `certbot renew` twice a day via a `systemd` timer. On non-systemd distributions, this functionality is provided by a script placed in `/etc/cron.d`. This task runs twice a day and will renew any certificate that's within thirty days of expiration.
+
+To test the renewal process, you can do a dry run with Certbot:
+
+```console
+rohit@hostname:~$ sudo certbot renew --dry-run
+```
+
+If you see no errors, you're all set.
+
+When necessary, Certbot will renew your certificates and reload Nginx to pick up the changes. If the automated renewal process ever fails, Let’s Encrypt will send a message to the email you specified, warning you when your certificate is about to expire.
+
+## Conclusion
+
+You now have a Node.js application running on a DigitalOcean server with SSL/HTTPS encryption and a custom domain!
+
+Good luck with your Node.js development!
