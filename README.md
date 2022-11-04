@@ -1,4 +1,5 @@
 # Deploying MERN Stack App on DigitalOcean
+
 In this tutorial, we'll deploy a MERN Stack application on a DigitalOcean server in the cloud with SSL/HTTPS encryption and a custom domain.
 
 Furthermore, Nginx will be used as a reverse proxy and Let's Encrypt and Certbot will be used to configure SSL/HTTPS encryption for your application.
@@ -6,6 +7,128 @@ Furthermore, Nginx will be used as a reverse proxy and Let's Encrypt and Certbot
 When the Node.js application is running on the server, we'll use PM2 to keep the application running forever without any downtime.
 
 ### Let's get started!
+
+
+<!-- TABLE OF CONTENTS -->
+
+### Table of Contents
+<ol>
+  <li>
+  <a href="#step-1---create--configure-a-new-digitalocean-server">Create & Configure A New DigitalOcean Server</a>
+
+  <ul>
+    <li><a href="#create-new-droplet-on-digitalocean">Create New Droplet On DigitalOcean</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#setting-up-ssh-in-digitalocean-droplet">Setting up SSH in DigitalOcean Droplet</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#access-the-server-using-root">Access The Server Using Root</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#create-a-new-user">Create A New User</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#give-your-new-user-root-privileges">Give Your New User Root Privileges</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#add-ssh-keys-for-new-account">Add SSH keys for new account</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#disable-password-authentication">Disable Password Authentication</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#test-log-in-using-ssh-key">Test Log In Using SSH Key</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#basic-firewall-set-up">Basic Firewall Set Up</a></li>
+  </ul>
+  </li>
+
+  <li>
+    <a href="#step-2---configure-your-domain-name">Configure Your Domain Name</a>
+
+  <ul>
+    <li><a href="#configure-dns">Configure DNS</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#configure-your-domain-registrar-to-direct-the-domain-to-digitalocean">Configure Your Domain Registrar To Direct The Domain To DigitalOcean</a></li>
+  </ul>
+  </li>
+
+  <li>
+  <a href="#step-3---install--configure-nginx">Install & Configure Nginx</a>
+
+  <ul>
+    <li><a href="#install-nginx">Install Nginx</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#adjust-the-firewall">Adjust The Firewall</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#test-your-web-server">Test Your Web Server</a></li>
+  </ul>
+  </li>
+
+  <li>
+  <a href="#step-4---configure-the-nodejs-application">Configure The Node.js Application</a>
+
+  <ul>
+    <li><a href="#install-nodejs">Install Node.js</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#create-a-nodejs-application">Create a Node.js application</a></li>
+  </ul>
+  </li>
+
+  <li>
+  <a href="#step-5---install--configure-pm2">Install & Configure PM2</a>
+
+  <ul>
+    <li><a href="#install-pm2">Install PM2</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#start-application">Start Application</a></li>
+  </ul>
+  </li>
+
+  <li>
+  <a href="#step-6---setup-nginx-as-a-reverse-proxy">Setup Nginx As A Reverse Proxy</a>
+  </li>
+
+  <li>
+  <a href="#step-7---configure-sslhttps-using-lets-encrypt--certbot">Configure SSL/HTTPS Using Let's Encrypt & Certbot</a>
+
+  <ul>
+    <li><a href="#install-certbot">Install Certbot</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#allow-https-access-in-your-firewall">Allow HTTPS Access In Your Firewall</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#get-the-ssl-certificate-from-certbot">Get The SSL Certificate From Certbot</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#verify-certbot-auto-renew">Verify Certbot Auto-Renew</a></li>
+  </ul>
+  </li>
+</ol>
 
 ## Step 1 - Create & Configure A New DigitalOcean Server
 
@@ -30,6 +153,8 @@ Next, they allow you to choose the datacenter region for your server. This is th
 In the Authentication section, make sure the SSH keys option is selected for more security and passwordless login to your server.
 
 ![Authentication](./assets/authentication.png)
+
+<p align="right">(<a href="#deploying-mern-stack-app-on-digitalocean">back to top</a>)</p>
 
 ### Setting up SSH in DigitalOcean Droplet
 
@@ -75,6 +200,8 @@ Your server is now up and running!
 
 In the next step, we'll complete the initial configuration process for the server. This will include logging into the server, setting up SSH access to the server, and creating a basic firewall.
 
+<p align="right">(<a href="#deploying-mern-stack-app-on-digitalocean">back to top</a>)</p>
+
 ### Access The Server Using Root
 
 The first step is to gain access to the server using your root login.
@@ -90,6 +217,8 @@ Accept the warning about host authenticity, if it appears.
 The `root` user in a Linux environment has very broad privileges and, for that reason, you are discouraged from using it on a regular basis.
 
 Therefore, in the next step, we are going to create an alternative account with limited scope that will be used for daily work.
+
+<p align="right">(<a href="#deploying-mern-stack-app-on-digitalocean">back to top</a>)</p>
 
 ### Create A New User
 
@@ -113,6 +242,8 @@ Just hit enter through all the questions. You will be asked for a use password a
 
 ![Create a New User](./assets/create_a_new_user.png)
 
+<p align="right">(<a href="#deploying-mern-stack-app-on-digitalocean">back to top</a>)</p>
+
 ### Give Your New User Root Privileges
 
 You now have a new user account with regular account privileges. But you might occasionally need to do administrative tasks that require `root` privileges.
@@ -126,6 +257,8 @@ root@hostname:~# usermod -aG sudo bob
 ```
 
 Now your user can run commands with `root` privileges!
+
+<p align="right">(<a href="#deploying-mern-stack-app-on-digitalocean">back to top</a>)</p>
 
 ### Add SSH keys for new account
 
@@ -183,6 +316,8 @@ rohit@hostname:~$ exit
 
 Now your public key is installed, and you can use SSH keys to log in as your user.
 
+<p align="right">(<a href="#deploying-mern-stack-app-on-digitalocean">back to top</a>)</p>
+
 ### Disable Password Authentication
 
 This is an extra security step. We can disable passwords so that only your local machine with the correct SSH keys can login.
@@ -209,6 +344,8 @@ rohit@hostname:~$ sudo systemctl reload sshd
 
 Password authentication is now disabled. Now your server can only be accessed with SSH key authentication.
 
+<p align="right">(<a href="#deploying-mern-stack-app-on-digitalocean">back to top</a>)</p>
+
 ### Test Log In Using SSH Key
 
 Let's test logging in using the SSH key.
@@ -226,6 +363,8 @@ $ ssh -i ~/.ssh/PRIVATE_KEY_FILE_NAME USERNAME@SERVER_IP_ADDRESS
 ```
 
 Once authentication is provided to the server, you will be logged in as your new user.
+
+<p align="right">(<a href="#deploying-mern-stack-app-on-digitalocean">back to top</a>)</p>
 
 ### Basic Firewall Set Up
 
@@ -264,6 +403,8 @@ rohit@hostname:~$ sudo ufw status
 ```
 
 That was the last step in the initial setup for the server.
+
+<p align="right">(<a href="#deploying-mern-stack-app-on-digitalocean">back to top</a>)</p>
 
 ## Step 2 - Configure Your Domain Name
 
@@ -305,6 +446,8 @@ Make sure the `A` records are pointed to the correct server droplet.
 
 Awesome, we can move on to the next step.
 
+<p align="right">(<a href="#deploying-mern-stack-app-on-digitalocean">back to top</a>)</p>
+
 ### Configure Your Domain Registrar To Direct The Domain To DigitalOcean
 
 To use the DigitalOcean DNS, you'll need to update the nameservers used by your domain registrar to point at DigitalOcean's nameservers instead.
@@ -331,6 +474,8 @@ During this time, the domain registrar communicates the changes you've made with
 
 You should now have a domain pointing at your newly created DigitalOcean server.
 
+<p align="right">(<a href="#deploying-mern-stack-app-on-digitalocean">back to top</a>)</p>
+
 ## Step 3 - Install & Configure Nginx
 
 Now we need to install NGINX to serve our app on port 80, which is the http port
@@ -348,6 +493,8 @@ rohit@hostname:~$ sudo apt-get update && sudo apt-get install nginx
 The `apt-get` command will install Nginx along with any other required dependencies.
 
 When those commands finish, Nginx will be available for you to use on the server.
+
+<p align="right">(<a href="#deploying-mern-stack-app-on-digitalocean">back to top</a>)</p>
 
 ### Adjust The Firewall
 
@@ -391,6 +538,8 @@ rohit@hostname:~$ sudo ufw status
 
 You should see Nginx HTTP listed in the output.
 
+<p align="right">(<a href="#deploying-mern-stack-app-on-digitalocean">back to top</a>)</p>
+
 ### Test Your Web Server
 
 The Nginx web server should already be up and running.
@@ -418,6 +567,8 @@ You should see the default Nginx landing page, which should look something like 
 ![Nginx landing page](./assets/nginx_landing_page.png)
 
 You now have a web server running!
+
+<p align="right">(<a href="#deploying-mern-stack-app-on-digitalocean">back to top</a>)</p>
 
 
 ## Step 4 - Configure The Node.js Application
@@ -472,13 +623,15 @@ rohit@hostname:~$ node --version && npm --version
 
 Node.js is now installed and ready to use. Let's get a Node.js application up and running!
 
+<p align="right">(<a href="#deploying-mern-stack-app-on-digitalocean">back to top</a>)</p>
+
 ### Create a Node.js application
 
 We'll use a simple application to get you started, which you can replace with your own application later on. For now, we'll create an application that simply returns `Hello from your node app!` to any HTTP requests.
 
 If you already have an application ready to go, you can skip the next section where we create a sample application.
 
-### Application Code
+#### Application Code
 
 Navigate to your home directory:
 
@@ -522,7 +675,7 @@ When ran, the `server.js` application will simply listen on the `localhost` addr
 
 Save the file and exit the editor (`CTRL-X`+`Y`+`ENTER`).
 
-### Test Application
+#### Test Application
 
 To test your application, run the `server.js` file with the following command:
 
@@ -552,6 +705,8 @@ If you don't see the right output, make sure your application is running and con
 
 Once you have confirmed the application is working, kill the application with `CTRL`+`C`.
 
+<p align="right">(<a href="#deploying-mern-stack-app-on-digitalocean">back to top</a>)</p>
+
 ## Step 5 - Install & Configure PM2
 
 You are now ready to install and configure [PM2](https://github.com/Unitech/pm2 "PM2"), which is a process manager for Node.js applications. It will allow you to keep your Node.js application alive forever, reload it without downtime and help facilitate common system admin tasks.
@@ -565,6 +720,8 @@ rohit@hostname:~$ sudo npm install -g pm2
 ```
 
 The `-g` option tells `npm` to install the module globally. It will now be available across your server's system.
+
+<p align="right">(<a href="#deploying-mern-stack-app-on-digitalocean">back to top</a>)</p>
 
 ### Start Application
 
@@ -611,6 +768,8 @@ To check the status of the new systemd unit, use the following command:
 ```console
 rohit@hostname:~$ systemctl status pm2-rohit
 ```
+
+<p align="right">(<a href="#deploying-mern-stack-app-on-digitalocean">back to top</a>)</p>
 
 ## Step 6 - Setup Nginx As A Reverse Proxy
 
@@ -701,6 +860,8 @@ Try it out by viewing the `www.your_domain.com` web page in your browser.
 
 You should see the `Hello from your node app!` message displayed on the page. This means your Node.js application is up and running!
 
+<p align="right">(<a href="#deploying-mern-stack-app-on-digitalocean">back to top</a>)</p>
+
 ## Step 7 - Configure SSL/HTTPS Using Let's Encrypt & Certbot
 
 [Let's Encrypt](https://letsencrypt.org/ "Let's Encrypt") is a Certificate Authority (CA) that provides an easy way to obtain and install free SSL certificates, thereby enabling encrypted HTTPS on web servers. It simplifies the process by providing a software client, [Certbot](https://certbot.eff.org/ "Certbot"), that attempts to automate most (if not all) of the required steps.
@@ -735,6 +896,8 @@ rohit@hostname:~$ sudo apt-get install python3-certbot-nginx
 
 Certbot is now ready to use!
 
+<p align="right">(<a href="#deploying-mern-stack-app-on-digitalocean">back to top</a>)</p>
+
 ### Allow HTTPS Access In Your Firewall
 
 Previously, we configured the `ufw` firewall on your server to allow HTTP traffic. To additionally let in HTTPS traffic, we need to allow the `Nginx Full` profile and then delete the redundant `Nginx HTTP` allowance.
@@ -752,6 +915,8 @@ rohit@hostname:~$ sudo ufw delete allow 'Nginx HTTP'
 ```
 
 We're now ready to run Certbot and fetch the `SSL` certificates.
+
+<p align="right">(<a href="#deploying-mern-stack-app-on-digitalocean">back to top</a>)</p>
 
 ### Get The SSL Certificate From Certbot
 
@@ -792,6 +957,8 @@ Enter your domain into your browser's address bar and check it out:
 
 Your certificates are now downloaded, installed, and loaded. And notice that your website is now being served over HTTPS.
 
+<p align="right">(<a href="#deploying-mern-stack-app-on-digitalocean">back to top</a>)</p>
+
 ### Verify Certbot Auto-Renew
 
 Let's Encrypt's certificates are only valid for 90 days. This is to encourage users to automate their certificate renewal process.
@@ -808,8 +975,12 @@ If you see no errors, you're all set.
 
 When necessary, Certbot will renew your certificates and reload Nginx to pick up the changes. If the automated renewal process ever fails, Let’s Encrypt will send a message to the email you specified, warning you when your certificate is about to expire.
 
+<p align="right">(<a href="#deploying-mern-stack-app-on-digitalocean">back to top</a>)</p>
+
 ## Conclusion
 
 You now have a Node.js application running on a DigitalOcean server with SSL/HTTPS encryption and a custom domain!
 
 Good luck with your Node.js development!
+
+<p align="right">(<a href="#deploying-mern-stack-app-on-digitalocean">back to top</a>)</p>
