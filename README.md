@@ -984,3 +984,10 @@ You now have a Node.js application running on a DigitalOcean server with SSL/HTT
 Good luck with your Node.js development!
 
 <p align="right">(<a href="#deploying-mern-stack-app-on-digitalocean">back to top</a>)</p>
+
+## Resources
+
+- [Deploy A Node.js Application To DigitalOcean With HTTPS](https://www.coderrocketfuel.com/article/deploy-a-nodejs-application-to-digital-ocean-with-https)
+- [How to use Nginx as a reverse proxy for a Node.js server](https://blog.logrocket.com/how-to-run-a-node-js-server-with-nginx/)
+
+<p align="right">(<a href="#deploying-mern-stack-app-on-digitalocean">back to top</a>)</p>
