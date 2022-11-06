@@ -253,7 +253,7 @@ To do this, we need to add your new user to the `sudo` group on the machine.
 As `root`, run the following command to add your user to the `sudo` group (substitute `rohit` with your username):
 
 ```console
-root@hostname:~# usermod -aG sudo bob
+root@hostname:~# usermod -aG sudo rohit
 ```
 
 Now your user can run commands with `root` privileges!
